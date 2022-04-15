@@ -4,12 +4,12 @@ import 'package:real_shopping_app/providers/cart.dart';
 
 class CartItem extends StatelessWidget {
   final String? id;
-  final String ? productId;
+  final String? productId;
   final double? price;
   final int? quantity;
   final String? title;
 
-  CartItem({this.id,this.productId, this.price, this.quantity, this.title});
+  CartItem({this.id, this.productId, this.price, this.quantity, this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +27,33 @@ class CartItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
       ),
       direction: DismissDirection.endToStart,
-      onDismissed: (direction){
-        Provider.of<Cart>(context,listen: false).removeItem(productId!);
+      confirmDismiss: (direction) {
+        return showDialog(
+            context: context,
+            builder: (ctx) {
+              return AlertDialog(
+                title: const Text('Are you sure?'),
+                content:
+                    const Text('Do you want to remove the item from the cart'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: const Text('No'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text('Yes'),
+                  ),
+                ],
+              );
+            });
+      },
+      onDismissed: (direction) {
+        Provider.of<Cart>(context, listen: false).removeItem(productId!);
       },
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),

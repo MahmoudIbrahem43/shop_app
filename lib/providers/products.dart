@@ -10,7 +10,6 @@ class Products with ChangeNotifier {
       price: 29.99,
       imageUrl:
           'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-      
     ),
     Product(
       id: 'p2',
@@ -42,16 +41,39 @@ class Products with ChangeNotifier {
     return [..._items];
   }
 
-  void addProduct() {
-    // _items.add(value);
+  void addProduct(Product product) {
+    var newProduct = Product(
+        id: DateTime.now.toString(),
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl);
+    _items.insert(0, newProduct);
+    notifyListeners();
+  }
+
+  void deleteProduct(Product product) {
+    _items.remove(product);
     notifyListeners();
   }
 
   Product findById(String id) {
     return _items.firstWhere((element) => element.id == id);
+    notifyListeners();
   }
 
   List<Product> get favouritProduct {
     return _items.where((element) => element.isFavourit).toList();
+  }
+
+  void updateProduct(id, Product newProduct) {
+    final productIndex =
+        _items.indexWhere((product) => product.id == id);
+    if (productIndex >= 0) {
+      _items[productIndex] = newProduct;
+      notifyListeners();
+    }else{
+      print('...');
+    }
   }
 }
