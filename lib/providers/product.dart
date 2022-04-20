@@ -1,7 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
 
-class Product with ChangeNotifier{
-  final String ? id;
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class Product with ChangeNotifier {
+  final String? id;
   final String title;
   final String description;
   final double price;
@@ -14,11 +17,24 @@ class Product with ChangeNotifier{
       required this.description,
       required this.price,
       required this.imageUrl,
-      this.isFavourit= false
-      });
+      this.isFavourit = false});
 
-      void toggleFavouritStatus(){
-        isFavourit=!isFavourit;
+  Future<void> toggleFavouritStatus() async {
+    final oldStatus = isFavourit;
+    isFavourit = !isFavourit;
+    notifyListeners();
+    final url = Uri.parse(
+        'https://shop-app-6390e-default-rtdb.firebaseio.com/products/$id.json');
+    try {
+      final response =
+          await http.patch(url, body: jsonEncode({'isFavorite': isFavourit}));
+      if (response.statusCode >= 400) {
+        isFavourit = oldStatus;
         notifyListeners();
       }
+    } catch (error) {
+      isFavourit = oldStatus;
+      notifyListeners();
+    }
+  }
 }

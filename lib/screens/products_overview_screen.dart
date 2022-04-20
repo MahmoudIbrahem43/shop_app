@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:real_shopping_app/providers/cart.dart';
+import 'package:real_shopping_app/providers/products.dart';
 import 'package:real_shopping_app/screens/cart_screen.dart';
 import 'package:real_shopping_app/widgets/app_drawer.dart';
 import 'package:real_shopping_app/widgets/badge.dart';
@@ -18,6 +19,32 @@ class ProductsOverViewScreen extends StatefulWidget {
 
 class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
   var _showOnlyFavourits = false;
+  var _isInit = true;
+  var _isLoading = false;
+
+  // @override
+  // void initState() {
+  //   Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+  //   super.initState();
+  // }
+
+  @override
+  void didChangeDependencies()async {
+    if (_isInit) {
+     setState(() {
+        _isLoading = true;
+     });
+     await Provider.of<Products>(context).fetchAndSetProducts().then((_){
+       setState(() {
+         _isLoading=false;
+       });
+     });
+    }
+    _isInit = false;
+    // print(Provider.of<Products>(context).items[0].title);
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +79,6 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
               builder: (context, cart, ch) => Badge(
                 child: ch!,
                 value: cart.itemsCount.toString(),
-          
               ),
               child: IconButton(
                 icon: const Icon(Icons.shopping_cart),
@@ -64,8 +90,12 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
           ],
         ),
         drawer: AppDrawer(),
-        body: productsGrid(
-          isFavourit: _showOnlyFavourits,
-        ));
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : productsGrid(
+                isFavourit: _showOnlyFavourits,
+              ));
   }
 }

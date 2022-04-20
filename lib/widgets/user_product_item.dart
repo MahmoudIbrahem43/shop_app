@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:real_shopping_app/providers/product.dart';
 import 'package:real_shopping_app/providers/products.dart';
 import 'package:real_shopping_app/screens/edit_product_screen.dart';
 
@@ -25,7 +24,8 @@ class UserProductItem extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, EditProductScreen.routeName,arguments: id);
+                Navigator.pushNamed(context, EditProductScreen.routeName,
+                    arguments: id);
               },
               icon: Icon(
                 Icons.edit,
@@ -33,11 +33,14 @@ class UserProductItem extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () {
-                Product product = Provider.of<Products>(context, listen: false)
-                    .findById(id.toString());
-                Provider.of<Products>(context, listen: false)
-                    .deleteProduct(product);
+              onPressed: () async {
+                try {
+                  await Provider.of<Products>(context, listen: false)
+                      .deleteProduct(id!);
+                } catch (erro) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Deleting Failed')));
+                }
               },
               icon: const Icon(
                 Icons.delete,
